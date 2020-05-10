@@ -1,19 +1,50 @@
-const request = require("request")
-const url1 = 'https://api.darksky.net/forecast/a2958fd4b083d496f479d49678e68a27/37.8267,-122.4233?units=si&lang=en'
-const url2 = "https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?access_token=pk.eyJ1Ijoia2FtYWw5OCIsImEiOiJjazl6Nzd3bXAwYnRsM2RudnE5aXg0aHY0In0.F1pd05rqzkfrd3EUj27msQ&limit=1"
-request({
-    url:url1,
-    json:true
-},(error,response)=>{
-    //const data = JSON.parse(response.body)
-    //console.log(response.body.currently)
-    console.log(response.body.daily.summary+" It's currently "+ response.body.currently.temperature +" and there is "
-    + response.body.currently.precipProbability +" chance to rain")
-    })
+const geocode = require("./utils/geocode")
+const forecast = require("./utils/forecast")
 
-request({
-    url:url2,
-    json:true
-},(error,response)=>{
-    console.log(response.body.features[0].center)
-})
+    
+
+if(process.argv.length < 3){
+    return console.log("you didn't specify a location for the forcast")
+}
+var location = ""
+for(i=2;i<process.argv.length;i++){
+    location+=process.argv[i]+" "
+}
+//console.log(location)
+
+const forecast_callback = (error,response)=>{
+    if(error){
+        console.log("something went wrong , error code : "+error.code)
+    }else if(response.body.error){
+        console.log("bad request , error message : "+response.body.error)
+    }else{
+        console.log(response.body.daily.summary+" It's currently "+ response.body.currently.temperature +" and there is "
+        + response.body.currently.precipProbability +" chance to rain")
+    
+    }
+}
+
+
+
+
+const geocode_callback = (error,response)=>{
+    if(error){
+        console.log("something went wrong , error code : "+error.code)
+    }else if(response.body.error){
+        console.log("bad request , error message : "+response.body.error)
+    }else if(response.body.features.length === 0){
+        console.log("unable to find location !")
+    }else{
+        console.log("the location u r searching for : "+response.body.features[0].place_name)
+        console.log("the location coordinates : " + response.body.features[0].center)
+        forecast(response.body.features[0].center[1],response.body.features[0].center[0],forecast_callback)
+    }
+    
+}
+
+
+
+geocode.geo_code(location, geocode_callback)
+
+
+
