@@ -12,14 +12,14 @@ for(i=2;i<process.argv.length;i++){
 }
 //console.log(location)
 
-const forecast_callback = (error,response)=>{
+const forecast_callback = (error,body)=>{
     if(error){
         console.log("something went wrong , error code : "+error.code)
-    }else if(response.body.error){
-        console.log("bad request , error message : "+response.body.error)
+    }else if(body.error){
+        console.log("bad request , error message : "+body.error)
     }else{
-        console.log(response.body.daily.summary+" It's currently "+ response.body.currently.temperature +" and there is "
-        + response.body.currently.precipProbability +" chance to rain")
+        console.log(body.daily.summary+" It's currently "+ body.currently.temperature +" and there is "
+        + body.currently.precipProbability +" chance to rain")
     
     }
 }
@@ -27,17 +27,17 @@ const forecast_callback = (error,response)=>{
 
 
 
-const geocode_callback = (error,response)=>{
+const geocode_callback = (error,body)=>{
     if(error){
         console.log("something went wrong , error code : "+error.code)
-    }else if(response.body.error){
-        console.log("bad request , error message : "+response.body.error)
-    }else if(response.body.features.length === 0){
+    }else if(body.error){
+        console.log("bad request , error message : "+body.error)
+    }else if(body.features.length === 0){
         console.log("unable to find location !")
     }else{
-        console.log("the location u r searching for : "+response.body.features[0].place_name)
-        console.log("the location coordinates : " + response.body.features[0].center)
-        forecast(response.body.features[0].center[1],response.body.features[0].center[0],forecast_callback)
+        console.log("the location u r searching for : "+body.features[0].place_name)
+        console.log("the location coordinates : " + body.features[0].center)
+        forecast(body.features[0].center[1],body.features[0].center[0],forecast_callback)
     }
     
 }
